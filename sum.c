@@ -26,7 +26,7 @@ int main() {
     }
 
     double start = omp_get_wtime();
-    //pragma omp parallel for reduction(+:sum)
+    #pragma omp parallel for reduction(+:sum)
     for (i = 0; i < n; i++) {
         sum += arr[i];
     }
