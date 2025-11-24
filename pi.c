@@ -1,29 +1,25 @@
-//Estimate the value of pi using:Parallelize the code by removing loop carried dependency.
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include <omp.h>
 
 int main() {
-    long num_points = 100000000;  // 100 million
-    long inside_circle = 0;
-    double x, y;
+    long int N = 10000000;
+    double pi = 0.0;
 
-    double start = omp_get_wtime();
-
-    #pragma omp parallel for private(x, y) reduction(+:inside_circle)
-    for (long i = 0; i < num_points; i++) {
-        x = (double)rand() / RAND_MAX;
-        y = (double)rand() / RAND_MAX;
-        if (x*x + y*y <= 1.0)
-            inside_circle++;
+    // Parallelize the loop with reduction to avoid loop-carried dependency
+    #pragma omp parallel for reduction(+:pi)
+    for (long int i = 0; i < N; i++) {
+        double term = (i % 2 == 0 ? 1.0 : -1.0) / (2.0 * i + 1.0);
+        pi += term;
     }
 
-    double pi_estimate = 4.0 * inside_circle / num_points;
-    double end = omp_get_wtime();
+    pi = 4.0 * pi;
+    printf("Estimated PI = %lf\n", pi);
 
-    printf("Parallel Pi Estimate: %f\n", pi_estimate);
-    printf("Parallel Time: %f seconds\n", end - start);
     return 0;
 }
+
+
+// gcc pg7.c -o pg7 -fopenmp
+// ./pg7
+
+// Estimated PI = 3.141593
